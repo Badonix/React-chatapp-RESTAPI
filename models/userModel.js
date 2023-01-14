@@ -53,4 +53,19 @@ userSchema.statics.signup = async function (email, password, username, url) {
   return user;
 };
 
+userSchema.statics.login = async function (username, password) {
+  if (!username || !password) {
+    throw Error("Fill in all fields!");
+  }
+  const user = await this.findOne({ username });
+  if (!user) {
+    throw Error("Credentials are not correct");
+  }
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    throw Error("Credentials are not correct");
+  }
+  return user;
+};
+
 module.exports = mongoose.model("User", userSchema);
