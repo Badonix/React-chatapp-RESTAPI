@@ -30,7 +30,7 @@ userSchema.statics.signup = async function (email, password, username, url) {
     throw Error("Fill in all fields!");
   }
   if (!validator.isEmail(email)) {
-    throw Error("This is definietly not an email");
+    throw Error("Enter valid email");
   }
   const emailExists = await this.findOne({ email });
   if (emailExists) {
