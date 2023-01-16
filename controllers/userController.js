@@ -46,8 +46,14 @@ const editUser = async (req, res) => {
       return res.status(400).json({ error: "Email is not in valid format" });
     }
     // Check if the new username or email already exists in the database
-    const userWithSameUsername = await User.findOne({ username: newUsername });
-    const userWithSameEmail = await User.findOne({ email: newEmail });
+    const userWithSameUsername = await User.findOne({
+      username: newUsername,
+      _id: { $ne: id },
+    });
+    const userWithSameEmail = await User.findOne({
+      email: newEmail,
+      _id: { $ne: id },
+    });
 
     if (userWithSameUsername) {
       return res.status(409).json({ error: "Username already taken" });
@@ -57,23 +63,17 @@ const editUser = async (req, res) => {
     }
 
     // Update the user's profile
-    let user;
-    const picture = req.file.path || "";
+    const user = await User.findById(id);
 
-    if (picture) {
-      user = await User.findByIdAndUpdate(
-        id,
-        { email: newEmail, username: newUsername, picture },
-        { new: true }
-      );
-    } else {
-      user = await User.findByIdAndUpdate(
-        id,
-        { email: newEmail, username: newUsername },
-        { new: true }
-      );
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
-
+    if (req.file) {
+      user.picture = req.file.path;
+    }
+    user.username = newUsername;
+    user.email = newEmail;
+    await user.save();
     res.json(user);
   } catch (e) {
     res.status(400).json(e.message);
