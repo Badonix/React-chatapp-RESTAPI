@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const validator = require("validator");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -41,17 +42,31 @@ const editUser = async (req, res) => {
   const newEmail = req.body.emailUpdated;
   const id = req.body.id;
   try {
+    const isEmail = validator.isEmail(newEmail);
+    if (!isEmail) {
+      return res.status(400).json({ error: "Email is not in valid format" });
+    }
+    // Check if the new username or email already exists in the database
+    const userWithSameUsername = await User.findOne({ username: newUsername });
+    const userWithSameEmail = await User.findOne({ email: newEmail });
+
+    if (userWithSameUsername) {
+      return res.status(409).json({ error: "Username already taken" });
+    }
+    if (userWithSameEmail) {
+      return res.status(409).json({ error: "Email already taken" });
+    }
+
+    // Update the user's profile
     const user = await User.findByIdAndUpdate(
       id,
       { email: newEmail, username: newUsername },
       { new: true }
     );
-    if (!user) {
-      throw Error("ragac veraris kargad");
-    }
+
     res.json(user);
   } catch (e) {
-    res.status(400).json(e);
+    res.status(400).json(e.message);
   }
 };
 
