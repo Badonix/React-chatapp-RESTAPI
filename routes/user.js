@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage });
-router.post("/signup", upload.single("picture"), signupUser);
+router.post("/signup", upload.single("photo"), signupUser);
 router.post("/login", loginUser);
-router.put("/edit", upload.single("picture"), editUser);
+router.put("/edit", upload.single("photo"), editUser);
 module.exports = router;

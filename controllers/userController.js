@@ -11,7 +11,6 @@ const createToken = (_id) => {
 const signupUser = async (req, res) => {
   const { email, username, password } = req.body;
   const picture = req.file.path;
-
   try {
     const user = await User.signup(email, password, username, picture);
     const token = createToken(user._id);
@@ -58,11 +57,22 @@ const editUser = async (req, res) => {
     }
 
     // Update the user's profile
-    const user = await User.findByIdAndUpdate(
-      id,
-      { email: newEmail, username: newUsername },
-      { new: true }
-    );
+    let user;
+    const picture = req.file.path || "";
+
+    if (picture) {
+      user = await User.findByIdAndUpdate(
+        id,
+        { email: newEmail, username: newUsername, picture },
+        { new: true }
+      );
+    } else {
+      user = await User.findByIdAndUpdate(
+        id,
+        { email: newEmail, username: newUsername },
+        { new: true }
+      );
+    }
 
     res.json(user);
   } catch (e) {
