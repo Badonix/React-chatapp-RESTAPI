@@ -94,4 +94,15 @@ const getUsers = async (req, res) => {
   }
 };
 
-module.exports = { signupUser, getUsers, loginUser, editUser };
+const getUser = async (req, res) => {
+  const idd = req.params.id;
+  try {
+    const user = await User.findById(idd);
+    const { id, username, email, picture } = user;
+    res.status(200).json({ id, username, email, picture });
+  } catch (error) {
+    res.json(error.message);
+  }
+};
+
+module.exports = { signupUser, getUser, getUsers, loginUser, editUser };

@@ -5,6 +5,7 @@ const {
   loginUser,
   editUser,
   getUsers,
+  getUser,
 } = require("../controllers/userController");
 const router = express.Router();
 const path = require("path");
@@ -23,6 +24,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 router.post("/signup", upload.single("photo"), signupUser);
 router.post("/login", loginUser);
+router.get("/:id", getUser);
 router.put("/edit", upload.single("photo"), editUser);
 router.post("/", getUsers);
 module.exports = router;
