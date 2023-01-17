@@ -4,6 +4,7 @@ const {
   signupUser,
   loginUser,
   editUser,
+  getUsers,
 } = require("../controllers/userController");
 const router = express.Router();
 const path = require("path");
@@ -23,4 +24,5 @@ const upload = multer({ storage });
 router.post("/signup", upload.single("photo"), signupUser);
 router.post("/login", loginUser);
 router.put("/edit", upload.single("photo"), editUser);
+router.post("/", getUsers);
 module.exports = router;

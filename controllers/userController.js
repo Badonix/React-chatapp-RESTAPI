@@ -80,4 +80,18 @@ const editUser = async (req, res) => {
   }
 };
 
-module.exports = { signupUser, loginUser, editUser };
+const getUsers = async (req, res) => {
+  const id = req.body.id;
+  try {
+    const users = await User.find(
+      { _id: { $ne: id } },
+      "-password -createdAt -updatedAt -__v -__v"
+    );
+
+    res.status(200).json(users);
+  } catch (error) {
+    res.json(error.message);
+  }
+};
+
+module.exports = { signupUser, getUsers, loginUser, editUser };
