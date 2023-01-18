@@ -105,4 +105,62 @@ const getUser = async (req, res) => {
   }
 };
 
-module.exports = { signupUser, getUser, getUsers, loginUser, editUser };
+const followUser = async (req, res) => {
+  const { followToId, userId } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    if (user.following.includes(followToId)) {
+      return res.status(401).json({ message: "User already followed" });
+    }
+    await User.updateOne(
+      { _id: user._id },
+      { $push: { following: followToId } }
+    );
+    await User.updateOne(
+      { _id: followToId },
+      { $push: { followers: user._id } }
+    );
+    res.status(200).json({ message: "Followed successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "An error occurred while following the user", error });
+  }
+};
+
+const unfollowUser = async (req, res) => {
+  const { userToUnfollowId, userId } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user.following.includes(userToUnfollowId)) {
+      return res
+        .status(401)
+        .json({ message: "You are not following this user " });
+    }
+    await User.updateOne(
+      { _id: user._id },
+      { $pull: { following: userToUnfollowId } }
+    );
+    await User.updateOne(
+      { _id: userToUnfollowId },
+      { $pull: { followers: user._id } }
+    );
+    res.status(200).json({ message: "Unfollowed successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "An error occurred while unfollowing the user", error });
+  }
+};
+
+module.exports = {
+  signupUser,
+  followUser,
+  getUser,
+  getUsers,
+  loginUser,
+  editUser,
+  unfollowUser,
+};
