@@ -98,8 +98,17 @@ const getUser = async (req, res) => {
   const idd = req.params.id;
   try {
     const user = await User.findById(idd);
-    const { id, username, email, picture } = user;
-    res.status(200).json({ id, username, email, picture });
+    const { id, username, email, picture, following, followers } = user;
+    res
+      .status(200)
+      .json({
+        id,
+        username,
+        email,
+        following: following.length,
+        followers: followers.length,
+        picture,
+      });
   } catch (error) {
     res.json(error.message);
   }
