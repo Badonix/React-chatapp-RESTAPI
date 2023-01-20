@@ -99,16 +99,14 @@ const getUser = async (req, res) => {
   try {
     const user = await User.findById(idd);
     const { id, username, email, picture, following, followers } = user;
-    res
-      .status(200)
-      .json({
-        id,
-        username,
-        email,
-        following: following.length,
-        followers: followers.length,
-        picture,
-      });
+    res.status(200).json({
+      id,
+      username,
+      email,
+      following: following,
+      followers: followers,
+      picture,
+    });
   } catch (error) {
     res.json(error.message);
   }
