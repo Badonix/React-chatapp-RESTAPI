@@ -8,6 +8,8 @@ const {
   unfollowUser,
   getUser,
   followUser,
+  getFollowers,
+  getFollowings,
 } = require("../controllers/userController");
 const router = express.Router();
 const path = require("path");
@@ -31,4 +33,6 @@ router.put("/edit", upload.single("photo"), editUser);
 router.post("/", getUsers);
 router.post("/unfollow", unfollowUser);
 router.post("/follow", followUser);
+router.post("/followers", getFollowers);
+router.post("/followings", getFollowings);
 module.exports = router;

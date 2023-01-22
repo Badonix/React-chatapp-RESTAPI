@@ -162,6 +162,29 @@ const unfollowUser = async (req, res) => {
   }
 };
 
+const getFollowers = async (req, res) => {
+  const userId = req.body.id;
+  User.findById(userId)
+    .populate({
+      path: "followers",
+      select: "username email picture _id",
+    })
+    .exec(function (err, user) {
+      res.json(user.followers);
+    });
+};
+const getFollowings = async (req, res) => {
+  const userId = req.body.id;
+  User.findById(userId)
+    .populate({
+      path: "following",
+      select: "username email picture _id",
+    })
+    .exec(function (err, user) {
+      res.json(user.following);
+    });
+};
+
 module.exports = {
   signupUser,
   followUser,
@@ -170,4 +193,6 @@ module.exports = {
   loginUser,
   editUser,
   unfollowUser,
+  getFollowers,
+  getFollowings,
 };
