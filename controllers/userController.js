@@ -128,8 +128,10 @@ const followUser = async (req, res) => {
       { _id: followToId },
       { $push: { followers: user._id } }
     );
+
     res.status(200).json({ message: "Followed successfully" });
   } catch (error) {
+    console.log(error.message);
     res
       .status(500)
       .json({ message: "An error occurred while following the user", error });

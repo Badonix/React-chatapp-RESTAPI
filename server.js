@@ -11,20 +11,43 @@ const io = require("socket.io")(server, { cors: { origin: "*" } });
 
 const userRoutes = require("./routes/user");
 
-io.on("connection", (socket) => {
-  console.log("OOPAAAA");
-  socket.emit("hello from server", "zdddd");
+let onlineUsers = [];
 
-  // receive a message from the client
-  socket.on("hello from client", (...args) => {
-    // ...
+const getUser = (uid) => {
+  return onlineUsers.find((user) => user.uid == uid);
+};
+
+const addOnlineUser = (uid, socketId) => {
+  !onlineUsers.some((user) => user.uid == uid) &&
+    onlineUsers.push({ uid, socketId });
+};
+
+const removeUser = (socketId) => {
+  onlineUsers = onlineUsers.filter((user) => user.socketId != socketId);
+};
+
+io.on("connection", (socket) => {
+  socket.on("new-user", (uid) => {
+    addOnlineUser(uid, socket.id);
   });
-  socket.on("hello", (...args) => {
-    console.log(args);
+
+  socket.on("disconnect", () => {
+    removeUser(socket.id);
+  });
+
+  socket.on("followUser", (data) => {
+    console.log(onlineUsers);
+    const { followToId } = data;
+    const { followerId } = data;
+    console.log(followToId, followerId);
+    const followToUser = getUser(followToId);
+    console.log(followToUser);
+    socket.to(followToUser.socketId).emit("followNotif", followerId);
   });
 });
+
 app.use((req, res, next) => {
-  console.log(req.path, req.method);
+  // console.log(req.path, req.method);
   next();
 });
 app.use("/images", express.static("./images"));
