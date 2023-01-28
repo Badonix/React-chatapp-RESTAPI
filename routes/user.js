@@ -10,6 +10,7 @@ const {
   followUser,
   getFollowers,
   getFollowings,
+  getNotifs,
 } = require("../controllers/userController");
 const router = express.Router();
 const path = require("path");
@@ -35,4 +36,5 @@ router.post("/unfollow", unfollowUser);
 router.post("/follow", followUser);
 router.post("/followers", getFollowers);
 router.post("/followings", getFollowings);
+router.get("/notifs/:id", getNotifs);
 module.exports = router;

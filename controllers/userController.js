@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Notification = require("../models/notificationModel");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const dotenv = require("dotenv");
@@ -128,7 +129,14 @@ const followUser = async (req, res) => {
       { _id: followToId },
       { $push: { followers: user._id } }
     );
-
+    const notification = await Notification.newNotif(
+      user.username,
+      user.picture,
+      followToId,
+      userId,
+      "Follow"
+    );
+    console.log(notification);
     res.status(200).json({ message: "Followed successfully" });
   } catch (error) {
     console.log(error.message);
@@ -187,6 +195,16 @@ const getFollowings = async (req, res) => {
     });
 };
 
+const getNotifs = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const notif = await Notification.find({ recieverId: id });
+    res.json(notif.reverse());
+  } catch (error) {
+    res.json(error.message);
+  }
+};
+
 module.exports = {
   signupUser,
   followUser,
@@ -197,4 +215,5 @@ module.exports = {
   unfollowUser,
   getFollowers,
   getFollowings,
+  getNotifs,
 };
