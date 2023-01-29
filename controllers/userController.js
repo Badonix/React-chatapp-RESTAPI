@@ -198,8 +198,10 @@ const getFollowings = async (req, res) => {
 const getNotifs = async (req, res) => {
   const { id } = req.params;
   try {
-    const notif = await Notification.find({ recieverId: id });
-    res.json(notif.reverse());
+    const notif = await Notification.find({ recieverId: id }).sort({
+      updatedAt: -1,
+    });
+    res.json(notif);
   } catch (error) {
     res.json(error.message);
   }

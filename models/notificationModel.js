@@ -33,12 +33,12 @@ notificationSchema.statics.newNotif = async function (
   senderId,
   notifType
 ) {
-  const notification = await this.create({
-    username,
-    picture,
-    recieverId,
-    senderId,
-    notifType,
+  const filter = { recieverId, senderId, notifType };
+  const update = { username, picture };
+
+  const notification = await this.findOneAndUpdate(filter, update, {
+    new: true,
+    upsert: true,
   });
   return notification;
 };
