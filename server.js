@@ -29,10 +29,14 @@ const removeUser = (socketId) => {
 io.on("connection", (socket) => {
   socket.on("new-user", (uid) => {
     addOnlineUser(uid, socket.id);
+    let onlineUserIds = onlineUsers.map((el) => el.uid);
+    socket.broadcast.emit("online-users", onlineUserIds);
   });
 
   socket.on("disconnect", () => {
     removeUser(socket.id);
+    let onlineUserIds = onlineUsers.map((el) => el.uid);
+    socket.broadcast.emit("online-users", onlineUserIds);
   });
 
   socket.on("followUser", (data) => {
