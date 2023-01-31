@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const Message = require("./models/messageModel");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -37,6 +38,15 @@ io.on("connection", (socket) => {
     removeUser(socket.id);
     let onlineUserIds = onlineUsers.map((el) => el.uid);
     socket.broadcast.emit("online-users", onlineUserIds);
+  });
+  socket.on("new-message", async (data) => {
+    const { sender, receiver, content } = data;
+    try {
+      const message = await Message.newMessage(sender, receiver, content);
+      console.log(message);
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   socket.on("followUser", (data) => {
