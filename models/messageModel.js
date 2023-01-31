@@ -19,12 +19,12 @@ const messageSchema = new Schema({
 });
 
 messageSchema.statics.newMessage = async function (sender, receiver, content) {
-  const message = await this.save({
+  const message = new this({
     senderId: sender,
     receiverId: receiver,
     content,
   });
-  return message;
+  const savedMessage = await message.save();
+  return savedMessage;
 };
-
 module.exports = mongoose.model("Message", messageSchema);
