@@ -42,6 +42,11 @@ io.on("connection", (socket) => {
   socket.on("new-message", async (data) => {
     const { sender, receiver, content } = data;
     try {
+      if (getUser(receiver)) {
+        const user = getUser(receiver);
+        console.log(user);
+        socket.to(user.socketId).emit("recieve-message", { content, sender });
+      }
       const message = await Message.newMessage(sender, receiver, content);
       console.log(message);
     } catch (e) {
