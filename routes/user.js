@@ -11,6 +11,7 @@ const {
   getFollowers,
   getFollowings,
   getNotifs,
+  getLastMessages,
 } = require("../controllers/userController");
 const router = express.Router();
 const path = require("path");
@@ -37,4 +38,5 @@ router.post("/follow", followUser);
 router.post("/followers", getFollowers);
 router.post("/followings", getFollowings);
 router.get("/notifs/:id", getNotifs);
+router.get("/lastmessage/:id", getLastMessages);
 module.exports = router;

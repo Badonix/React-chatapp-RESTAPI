@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const Notification = require("../models/notificationModel");
+const Message = require("../models/messageModel");
 const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const dotenv = require("dotenv");
@@ -207,6 +208,35 @@ const getNotifs = async (req, res) => {
   }
 };
 
+const getLastMessages = async (req, res) => {
+  const { id } = req.params;
+  try {
+    // Get all unique users you have interacted with
+    const uniqueUsers = await Message.distinct("senderId", {
+      $or: [{ senderId: id }, { receiverId: id }],
+    });
+
+    // Get the last message exchanged with each unique user
+    const lastMessages = await Message.aggregate([
+      { $match: { $or: [{ senderId: id }, { receiverId: id }] } },
+      { $sort: { createdAt: -1 } },
+      {
+        $group: {
+          _id: {
+            $cond: [{ $eq: ["$senderId", id] }, "$receiverId", "$senderId"],
+          },
+          message: { $first: "$content" },
+        },
+      },
+      { $project: { _id: 0, user: "$_id", message: 1 } },
+    ]);
+
+    res.json({ uniqueUsers, lastMessages });
+  } catch (error) {
+    res.json(error.message);
+  }
+};
+
 module.exports = {
   signupUser,
   followUser,
@@ -218,4 +248,5 @@ module.exports = {
   getFollowers,
   getFollowings,
   getNotifs,
+  getLastMessages,
 };
