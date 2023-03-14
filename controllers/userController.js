@@ -208,32 +208,19 @@ const getNotifs = async (req, res) => {
   }
 };
 
-const getLastMessages = async (req, res) => {
-  const { id } = req.params;
+const getMessages = async (req, res) => {
+  const { userId, senderId } = req.body;
+  console.log(userId, senderId);
   try {
-    // Get all unique users you have interacted with
-    const uniqueUsers = await Message.distinct("senderId", {
-      $or: [{ senderId: id }, { receiverId: id }],
+    const messages = await Message.find({
+      $or: [
+        { senderId: userId, receiverId: senderId },
+        { senderId: senderId, receiverId: userId },
+      ],
     });
-
-    // Get the last message exchanged with each unique user
-    const lastMessages = await Message.aggregate([
-      { $match: { $or: [{ senderId: id }, { receiverId: id }] } },
-      { $sort: { createdAt: -1 } },
-      {
-        $group: {
-          _id: {
-            $cond: [{ $eq: ["$senderId", id] }, "$receiverId", "$senderId"],
-          },
-          message: { $first: "$content" },
-        },
-      },
-      { $project: { _id: 0, user: "$_id", message: 1 } },
-    ]);
-
-    res.json({ uniqueUsers, lastMessages });
-  } catch (error) {
-    res.json(error.message);
+    res.json(messages);
+  } catch (e) {
+    res.json(e.message);
   }
 };
 
@@ -248,5 +235,5 @@ module.exports = {
   getFollowers,
   getFollowings,
   getNotifs,
-  getLastMessages,
+  getMessages,
 };
